@@ -1,9 +1,13 @@
+from helpers import log
+
+import os
 import sys
-from helpers import Lotto, log
 
+from lotto import Lotto
 
-LOTTO_DATABASE = "lottoDB"
-LOTTO_TIPS = "ordersDB"
+FOLDER = "database"
+LOTTO_DATABASE = os.path.join(FOLDER, "lottoDB")
+LOTTO_TIPS = os.path.join(FOLDER,"ordersDB")
 
 if __name__ == "__main__":
     try:
