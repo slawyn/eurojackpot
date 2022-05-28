@@ -1,17 +1,9 @@
 import os
-
-
-import datetime
-from datetime import timedelta
-
-
-
-import math
-import random
+import sys
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-from utils import *
+from utils import log, load_db, update_db, analysis_get_statistics, analysis_find_frequencies, analysis_find_numbers, convert_db_to_points
 from updater import fetch_difference_db
 from predictor import *
 
@@ -121,6 +113,7 @@ class Lotto:
         # Try to guess
         else:
             guessed = self.predictor.predict_simple(history_points, statistics)
+            log("Guessed: %s" % (guessed))
             guessed_in_history = analysis_find_numbers(self.history_db, guessed)
             if(len(guessed_in_history)>0):
                 log("Guessed numbers found in history_db: %s"%(str(guessed_in_history)))

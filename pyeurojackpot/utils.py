@@ -1,25 +1,25 @@
 
 import os
-import sys
-import time
+
 
 import datetime
-from datetime import timedelta
 
 from statistics import mean
 
 import math
-import numpy as np
+
 
 def log(s):
     """Logging function
     """
     print("%s ## %s"%(datetime.datetime.now().time(),s))
 
+
 def format_date(date):
     """Format date
     """
     return date.strftime("%2d-%2m-%4Y")
+
 
 def correlate(x, y):
     """Pearson's correlation
@@ -37,6 +37,7 @@ def correlate(x, y):
         return 0
     return num / den
 
+
 def load_db(filename):
     """Load DB file
     """
@@ -47,8 +48,6 @@ def load_db(filename):
     else:
         with open(filename,"r") as f:
             lines = f.readlines()
-
-
             for line in lines:
                 splits = line.strip().split(" ")
                 entry = [int(splits[1]),int(splits[2]),int(splits[3]),int(splits[4]),int(splits[5]),int(splits[6]),int(splits[7])]
@@ -57,6 +56,7 @@ def load_db(filename):
                 else:
                     database[splits[0]] = [entry]
     return database
+
 
 def update_db(filename, database, difference):
     """Update DB file
@@ -71,6 +71,7 @@ def update_db(filename, database, difference):
                 f.write(" " + n)
 
     return database
+
 
 def convert_db_to_points(database):
     """Convert db dictionary to list of points for each number
@@ -134,6 +135,7 @@ def analysis_find_frequencies(database):
 
     return max_combi_five, max_freq_five, max_combi_euro, max_freq_euro
 
+
 def analysis_find_numbers( database, arg_five_or_seven_numbers):
     """Find numbers
     """
@@ -155,7 +157,6 @@ def analysis_find_numbers( database, arg_five_or_seven_numbers):
     return found_five, found_euro
 
 
-
 def analysis_get_statistics( points):
     """Statistics
     """
@@ -168,11 +169,11 @@ def analysis_get_statistics( points):
     deviance_positive = []
     deviance_negative = []
 
-    directions = [[],[],[],[],[],[],[]]
-    distances = [[],[],[],[],[],[],[]]
+    directions = [[], [], [], [], [], [], []]
+    distances = [[], [], [], [], [], [], []]
     distance_means = []
 
-    most_frequent = [[0, 0],[0, 0],[0, 0],[0, 0],[0, 0],[0, 0],[0, 0] ]
+    most_frequent = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
     for x in range(7):
 
         c_data = points[x]
@@ -211,7 +212,7 @@ def analysis_get_statistics( points):
 
         distance_means.append(mean(distances[x]))
 
-        deviance_positive.append(means[x] + math.sqrt( accumulator/point_count))
-        deviance_negative.append(means[x] - math.sqrt( accumulator/point_count))
+        deviance_positive.append(means[x] + math.sqrt(accumulator/point_count))
+        deviance_negative.append(means[x] - math.sqrt(accumulator/point_count))
 
     return (means, mins, maxs, distance_means, deviance_positive, deviance_negative, directions, distances, most_frequent)
