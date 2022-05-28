@@ -10,7 +10,7 @@ class Predictor:
         self.orders_db = orders_db
 
     def predict_simple(self, history_points, statistics):
-        correlations = [[],[],[],[],[]]
+        correlations = [[], [], [], [], []]
         guessedmain = []
         guessedeuro = []
 
@@ -20,11 +20,10 @@ class Predictor:
         for x in range(0, 5):
             y = x + 1
             while y<5:
-                corr = correlate(directions[x],directions[y])
+                corr = correlate(directions[x], directions[y])
                 correlations[x].append(corr)
-                log("Correlation: [%d -> %d] %f"%(x+1, y+1, corr))
+                log("Correlation: [%d -> %d] %f" % (x + 1, y + 1, corr))
                 y +=1
-
 
         # First value
         guessdir = 1

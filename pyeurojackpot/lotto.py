@@ -164,12 +164,12 @@ class Lotto:
                 cmap = plt.cm.get_cmap('RdYlBu')
 
                 for x in range(len(axes)):
-                    axes[x].fill_between(xticks[:],[devianceplus[x]]*(tickcount),[devianceminus[x]]*(tickcount),facecolor='green', alpha=0.45,zorder=3)
+                    axes[x].fill_between(xticks[:], [devianceplus[x]] * (tickcount), [devianceminus[x]] * (tickcount), facecolor='green', alpha=0.45,zorder=3)
                     axes[x].plot(xticks[:], [means[x]]*(tickcount), zorder=3)
 
                 def animate(i):
                     out = []
-                    if i <tickcount:
+                    if i < tickcount:
                         for y in range(len(plotlines_data)):
                             plotlines_data[y][0].set_xdata(xticks[:i+1])
                             plotlines_data[y][0].set_ydata(history_points[y][orderoffset:orderoffset+i+1])

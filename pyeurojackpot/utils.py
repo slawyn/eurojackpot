@@ -12,7 +12,7 @@ import math
 def log(s):
     """Logging function
     """
-    print("%s ## %s"%(datetime.datetime.now().time(),s))
+    print("%s ## %s" % (datetime.datetime.now().time(), s))
 
 
 def format_date(date):
@@ -50,7 +50,7 @@ def load_db(filename):
             lines = f.readlines()
             for line in lines:
                 splits = line.strip().split(" ")
-                entry = [int(splits[1]),int(splits[2]),int(splits[3]),int(splits[4]),int(splits[5]),int(splits[6]),int(splits[7])]
+                entry = [int(splits[1]), int(splits[2]), int(splits[3]), int(splits[4]), int(splits[5]), int(splits[6]), int(splits[7])]
                 if splits[0] in database:
                     database[splits[0]].append(entry)
                 else:
