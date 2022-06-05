@@ -64,11 +64,10 @@ def update_db(filename, database, difference):
 
     with open(filename, "a") as f:
         for t, numbers in zip(difference[0], difference[1]):
-            database[t] = []
+            database[t] = [numbers]
             f.write("\n" + t)
             for n in numbers:
-                database[t].append(int(n))
-                f.write(" " + n)
+                f.write(" " + str(n))
 
     return database
 

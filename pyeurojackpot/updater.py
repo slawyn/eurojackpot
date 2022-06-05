@@ -89,7 +89,7 @@ def fetch_numbers(date):
     Returns:
         list (timestamps): numbers for date
     """
-    lotto_numbers = None
+    lotto_numbers = []
     fmt_request_date = DATE_REQUEST_FORMAT % (date.day,date.month,date.year)
     try:
         response = requests.get(WEBSITE + fmt_request_date)
@@ -97,7 +97,9 @@ def fetch_numbers(date):
         lottos = parsed_html.find('div',attrs={'class':LOTTO_NUMBERS_ID})
 
         if lottos != None and len(lottos.text.split()) == 7:
-            lotto_numbers = lottos.text.strip().split()
+            numbers = lottos.text.strip().split()
+            for n in numbers:
+                lotto_numbers.append(int(n))
 
         # New Data Container on the WEBSITE since 01.02.2021
         else:
@@ -108,10 +110,13 @@ def fetch_numbers(date):
             nums.extend(eval(lottos["extranumbers"]))
 
             if len(nums) == 7:
-                lotto_numbers = list(map(str, nums))
+                numbers = list(map(str, nums))
+                for n in numbers:
+                	lotto_numbers.append(int(n))
 
     except Exception as e:
         log(e)
+
 
     return lotto_numbers, fmt_request_date
 
@@ -160,12 +165,12 @@ def fetch_difference_db(database):
             lotto_numbers, fmt_start_date = fetch_numbers(request_date)
 
         # Check if lotto numbers were obtained
-        if lotto_numbers != None and lotto_numbers != "":
+        if lotto_numbers != [] and lotto_numbers != "":
             timestamps.append(fmt_start_date)
             numbers.append(lotto_numbers)
             log("Updating database...  %s\t%s" %(fmt_start_date, str(lotto_numbers)))
         else:
-            log("Problem: wrong lotto lotto_numbers for %s"%(fmt_start_date))
+            log("Problem: wrong lotto lotto_numbers for %s %s"%(fmt_start_date, str(lotto_numbers)))
 
     return timestamps, numbers
 

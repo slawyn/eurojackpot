@@ -32,6 +32,7 @@ class Lotto:
         difference_db = fetch_difference_db(self.history_db)
         self.history_db = update_db(filename_lotto_db, self.history_db, difference_db)
 
+
         # Predictor
         self.predictor = Predictor(self.history_db, self.orders_db)
 
