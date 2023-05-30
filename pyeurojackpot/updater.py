@@ -4,14 +4,15 @@ import datetime
 from datetime import timedelta
 
 import requests
-from bs4 import  BeautifulSoup
+from bs4 import BeautifulSoup
 import json
 
 import urllib
 
-import socket, ssl
+import socket
+import ssl
 
-MONTHS = ['','Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez',]
+MONTHS = ['', 'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez', ]
 WEBSITE = 'https://www.lottoland.com/eurojackpot/zahlen-quoten/'
 
 
@@ -21,23 +22,24 @@ LOTTO_NUMBERS_ID_ALT = "ll-lottery-balls"
 DATE_REQUEST_FORMAT = "%02d-%02d-%4d"
 
 MONTHS_ID = "dateSelect-selectDrawingsForYear-drawingsForYear"
-YEARS_ID ="dateSelect-selectYearAndDrawing-drawingYearRange"
-DATA_REQUEST  = {
-	"dateSelect-selectYearAndDrawing": "dateSelect-selectYearAndDrawing",
-	YEARS_ID: "2012",
-	"javax.faces.ViewState": "stateless",
-	"javax.faces.source": YEARS_ID,
-	"javax.faces.partial.event": "change",
-	"javax.faces.partial.execute": YEARS_ID  +" " +YEARS_ID,
-	"javax.faces.partial.render": "dateSelect-selectDrawingsForYear-drawingsForYear",
-	"javax.faces.behavior.event": "valueChange",
-	"Body-Version": "1.210.2",
-	"X-Skin": "lottoland",
-	"javax.faces.partial.ajax": "true"
+YEARS_ID = "dateSelect-selectYearAndDrawing-drawingYearRange"
+DATA_REQUEST = {
+    "dateSelect-selectYearAndDrawing": "dateSelect-selectYearAndDrawing",
+    YEARS_ID: "2012",
+    "javax.faces.ViewState": "stateless",
+    "javax.faces.source": YEARS_ID,
+    "javax.faces.partial.event": "change",
+    "javax.faces.partial.execute": YEARS_ID + " " + YEARS_ID,
+    "javax.faces.partial.render": "dateSelect-selectDrawingsForYear-drawingsForYear",
+    "javax.faces.behavior.event": "valueChange",
+    "Body-Version": "1.210.2",
+    "X-Skin": "lottoland",
+    "javax.faces.partial.ajax": "true"
 }
 
 DATE_2DAYS_EUROJACKPOT = datetime.datetime(2022, 3, 25, 12, 00)
 DATE_LOTTO_START = datetime.datetime(2012, 3, 23, 12, 00),
+
 
 def check_website(date):
     """Gets date of last entry on WEBSITE
@@ -49,17 +51,17 @@ def check_website(date):
     """
     update_required = False
     response = requests.get(WEBSITE)
-    parsed_html = BeautifulSoup(response.text,"html.parser")
+    parsed_html = BeautifulSoup(response.text, "html.parser")
 
-    years = parsed_html.find('select',attrs={'id':YEARS_ID})
-    months = parsed_html.find('select',attrs={'id':MONTHS_ID})
+    years = parsed_html.find('select', attrs={'id': YEARS_ID})
+    months = parsed_html.find('select', attrs={'id': MONTHS_ID})
 
     if years != None and months != None:
         years_txt = years.text
         months_txt = months.text
 
         try:
-            entries = months_txt.split("\n")[1].replace(",",".")
+            entries = months_txt.split("\n")[1].replace(",", ".")
             one_entry = entries.split(".")
             day = one_entry[1].strip()
             month = one_entry[2].strip()
@@ -72,13 +74,12 @@ def check_website(date):
                         update_required = True
                         break
         except Exception as e:
-             log("Problem:couldn't parse MONTHS and years ")
-             log(e)
+            log("Problem:couldn't parse MONTHS and years ")
+            log(e)
     else:
         log("Problem:couldn't get info from the page")
 
     return update_required
-
 
 
 def fetch_numbers(date):
@@ -90,11 +91,11 @@ def fetch_numbers(date):
         list (timestamps): numbers for date
     """
     lotto_numbers = []
-    fmt_request_date = DATE_REQUEST_FORMAT % (date.day,date.month,date.year)
+    fmt_request_date = DATE_REQUEST_FORMAT % (date.day, date.month, date.year)
     try:
         response = requests.get(WEBSITE + fmt_request_date)
-        parsed_html = BeautifulSoup(response.text,"html.parser")
-        lottos = parsed_html.find('div',attrs={'class':LOTTO_NUMBERS_ID})
+        parsed_html = BeautifulSoup(response.text, "html.parser")
+        lottos = parsed_html.find('div', attrs={'class': LOTTO_NUMBERS_ID})
 
         if lottos != None and len(lottos.text.split()) == 7:
             numbers = lottos.text.strip().split()
@@ -106,17 +107,16 @@ def fetch_numbers(date):
             lottos = parsed_html.find(LOTTO_NUMBERS_ID_ALT)
 
             # Integer arrays
-            nums = eval(lottos["numbers"] )
+            nums = eval(lottos["numbers"])
             nums.extend(eval(lottos["extranumbers"]))
 
             if len(nums) == 7:
                 numbers = list(map(str, nums))
                 for n in numbers:
-                	lotto_numbers.append(int(n))
+                    lotto_numbers.append(int(n))
 
     except Exception as e:
         log(e)
-
 
     return lotto_numbers, fmt_request_date
 
@@ -168,9 +168,8 @@ def fetch_difference_db(database):
         if lotto_numbers != [] and lotto_numbers != "":
             timestamps.append(fmt_start_date)
             numbers.append(lotto_numbers)
-            log("Updating database...  %s\t%s" %(fmt_start_date, str(lotto_numbers)))
+            log("Updating database...  %s\t%s" % (fmt_start_date, str(lotto_numbers)))
         else:
-            log("Problem: wrong lotto lotto_numbers for %s %s"%(fmt_start_date, str(lotto_numbers)))
+            log("Problem: wrong lotto lotto_numbers for %s %s" % (fmt_start_date, str(lotto_numbers)))
 
     return timestamps, numbers
-

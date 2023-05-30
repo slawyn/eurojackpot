@@ -46,7 +46,7 @@ def load_db(filename):
         with open(filename, 'w'):
             pass
     else:
-        with open(filename,"r") as f:
+        with open(filename, "r") as f:
             lines = f.readlines()
             for line in lines:
                 splits = line.strip().split(" ")
@@ -75,7 +75,7 @@ def update_db(filename, database, difference):
 def convert_db_to_points(database):
     """Convert db dictionary to list of points for each number
     """
-    points = [[],[],[],[],[],[],[]]
+    points = [[], [], [], [], [], [], []]
     for key, data in database.items():
         numbers = data[0]
         for x in range(len(numbers)):
@@ -102,13 +102,13 @@ def analysis_find_frequencies(database):
         #
         for key, numbers in database.items():
             for vals in numbers:
-                arg_five_or_seven_numbers = [vals[0], vals[1], vals[2],vals[3],vals[4]]
-                arg_euro_numbers = [vals[5],vals[6]]
+                arg_five_or_seven_numbers = [vals[0], vals[1], vals[2], vals[3], vals[4]]
+                arg_euro_numbers = [vals[5], vals[6]]
 
                 # Find maximumg between fives
-                five_key = "%d-%d-%d-%d-%d"%(vals[0], vals[1], vals[2], vals[3], vals[4])
+                five_key = "%d-%d-%d-%d-%d" % (vals[0], vals[1], vals[2], vals[3], vals[4])
                 if five_key in frequency_five:
-                    frequency_five[five_key] +=1
+                    frequency_five[five_key] += 1
                 else:
                     frequency_five[five_key] = 1
 
@@ -118,9 +118,9 @@ def analysis_find_frequencies(database):
                     max_combi_five = arg_five_or_seven_numbers
 
                 # Find maximum between euros
-                euro_key = "%d-%d"%(vals[5], vals[6])
+                euro_key = "%d-%d" % (vals[5], vals[6])
                 if euro_key in frequency_euro:
-                    frequency_euro[euro_key] +=1
+                    frequency_euro[euro_key] += 1
                 else:
                     frequency_euro[euro_key] = 1
 
@@ -135,7 +135,7 @@ def analysis_find_frequencies(database):
     return max_combi_five, max_freq_five, max_combi_euro, max_freq_euro
 
 
-def analysis_find_numbers( database, arg_five_or_seven_numbers):
+def analysis_find_numbers(database, arg_five_or_seven_numbers):
     """Find numbers
     """
     found_five = {}
@@ -144,7 +144,7 @@ def analysis_find_numbers( database, arg_five_or_seven_numbers):
     for key, numbers in database.items():
         for vals in numbers:
             if len(arg_five_or_seven_numbers) >= 5:
-                numbers_five = [vals[0],vals[1],vals[2],vals[3],vals[4]]
+                numbers_five = [vals[0], vals[1], vals[2], vals[3], vals[4]]
                 if numbers_five[0] == arg_five_or_seven_numbers[0] and numbers_five[1] == arg_five_or_seven_numbers[1] and numbers_five[2] == arg_five_or_seven_numbers[2] and numbers_five[3] == arg_five_or_seven_numbers[3] and numbers_five[4] == arg_five_or_seven_numbers[4]:
                     found_five[key] = numbers_five
 
@@ -156,11 +156,9 @@ def analysis_find_numbers( database, arg_five_or_seven_numbers):
     return found_five, found_euro
 
 
-def analysis_get_statistics( points):
+def analysis_get_statistics(points):
     """Statistics
     """
-
-    point_count   = len(points)
 
     means = []
     mins = []
@@ -184,7 +182,8 @@ def analysis_get_statistics( points):
         accumulator = 0
         frequency_number_count = [0] * (maxs[x] + 1)
 
-        for y in range(point_count):
+        y_len = len(c_data)
+        for y in range(y_len):
             accumulator += math.pow(c_data[y] - means[x], 2)
             frequency_number_count[c_data[y]] = frequency_number_count[c_data[y]] + 1
 
@@ -199,19 +198,17 @@ def analysis_get_statistics( points):
             else:
                 distances[x].append(abs(c_data[y]-c_data[y-1]))
 
-            #
+            # first is zero, the rest are scalars
             if y == 0:
-                directions[x].append(5)
+                directions[x].append(0)
+
             elif c_data[y] > c_data[y-1]:
-                directions[x].append(10)
-            elif c_data[y] < c_data[y-1]:
-                directions[x].append(0)
+                directions[x].append(c_data[y]-c_data[y-1])
             else:
-                directions[x].append(0)
+                directions[x].append(c_data[y-1] - c_data[y])
 
         distance_means.append(mean(distances[x]))
-
-        deviance_positive.append(means[x] + math.sqrt(accumulator/point_count))
-        deviance_negative.append(means[x] - math.sqrt(accumulator/point_count))
+        deviance_positive.append(means[x] + math.sqrt(accumulator/y_len))
+        deviance_negative.append(means[x] - math.sqrt(accumulator/y_len))
 
     return (means, mins, maxs, distance_means, deviance_positive, deviance_negative, directions, distances, most_frequent)
