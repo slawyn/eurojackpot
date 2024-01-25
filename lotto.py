@@ -7,12 +7,95 @@ import numpy as np
 from utils import log, load_db, update_db, analysis_get_statistics, analysis_find_frequencies, analysis_find_numbers, convert_db_to_points
 from updater import fetch_difference_db
 from predictor import *
-
+from statistics import mean
+import math
+from flask import Flask, render_template
 
 VERSION = "Lotto Numbers: ver. 2022-05-22"
 FOLDER = "database"
 LOTTO_HISTORY_DB = os.path.join(FOLDER, "lottoDB")
 LOTTO_ORDERS_DB = os.path.join(FOLDER, "ordersDB")
+
+
+app = Flask(__name__)
+
+
+class Statistics:
+    def __init__(self, points):
+        """Statistics
+        """
+        n_dim = len(points)
+        self.means = []
+        self.mins = []
+        self.maxs = []
+        self.deviance_positive = []
+        self.deviance_negative = []
+
+        self.accumulative = [[], [], [], [], [], [], []]
+        self.directions = [[], [], [], [], [], [], []]
+        self.distances = [[], [], [], [], [], [], []]
+        self.distance_means = []
+
+        most_frequent = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+        for x in range(n_dim):
+
+            c_data = points[x]
+            self.means.append(mean(c_data))
+            self.maxs.append(max(c_data))
+            self.mins.append(min(c_data))
+
+            # calculate deviance
+            accumulator = 0
+            c_acc = 0
+            frequency_number_count = [0] * (self.maxs[x] + 1)
+
+            m_dim = len(c_data)
+            for y in range(m_dim):
+                c_acc += c_data[y]
+                c_mean = c_acc/(y + 1)
+                self.accumulative[x].append(c_mean)
+
+                accumulator += math.pow(c_data[y] - self.means[x], 2)
+                frequency_number_count[c_data[y]] = frequency_number_count[c_data[y]] + 1
+
+                # Most frequent numbers
+                if frequency_number_count[c_data[y]] > most_frequent[x][0]:
+                    most_frequent[x][0] = frequency_number_count[c_data[y]]
+                    most_frequent[x][1] = c_data[y]
+
+                # Distances
+                if y == 0:
+                    self.distances[x].append(0)
+                else:
+                    self.distances[x].append(abs(c_data[y]-c_data[y-1]))
+
+                # first is zero, the rest are scalars
+                if y == 0:
+                    self.directions[x].append(0)
+
+                elif c_data[y] > c_data[y-1]:
+                    self.directions[x].append(c_data[y]-c_data[y-1])
+                else:
+                    self.directions[x].append(c_data[y-1] - c_data[y])
+
+            self.distance_means.append(mean(self.distances[x]))
+            self.deviance_positive.append(self.means[x] + math.sqrt(accumulator/m_dim))
+            self.deviance_negative.append(self.means[x] - math.sqrt(accumulator/m_dim))
+
+    def get_accumulative(self):
+        return self.accumulative
+
+    def get_means(self):
+        return self.means
+
+    def get_devianceplus(self):
+        return self.deviance_positive
+
+    def get_devianceminus(self):
+        return self.deviance_negative
+
+    def get_directions(self):
+        return self.directions
 
 
 class Lotto:
@@ -87,7 +170,7 @@ class Lotto:
         history_points = convert_db_to_points(self.history_db)
         orders_points = convert_db_to_points(self.orders_db)
 
-        statistics = analysis_get_statistics(history_points)
+        self.statistics = Statistics(history_points)
         freqs_history = analysis_find_frequencies(self.history_db)
         if (len(freqs_history) > 1):
             log("Repetitions found in history_db: %s" % (str(freqs_history)))
@@ -112,7 +195,7 @@ class Lotto:
 
         # Try to guess
         else:
-            guessed = self.predictor.predict_simple(history_points, statistics)
+            guessed = self.predictor.predict_simple(history_points, self.statistics)
             log("Guessed: %s" % (guessed))
             guessed_in_history = analysis_find_numbers(self.history_db, guessed)
             if (len(guessed_in_history) > 0):
@@ -127,7 +210,6 @@ class Lotto:
                 log("Guessed numbers are unique for orders_db")
 
         # Draw
-        means, mins, maxs, distance_means, devianceplus, devianceminus, directions, distances, most_frequent = statistics
         if self.opt_plot_data:
             fig, axes = plt.subplots(7, 1, constrained_layout=True)
             fig.canvas.set_window_title(VERSION)
@@ -208,7 +290,7 @@ class Lotto:
                                         hitsdata[y][j].append(mydata[y])
                                         sizes[y][j] = np.append(sizes[y][j], [20])
 
-                                    #colors[y][j] = np.append(colors[y][j],[abs(mydata[y]-realdata[y])])
+                                    # colors[y][j] = np.append(colors[y][j],[abs(mydata[y]-realdata[y])])
                                     scatters_order_data[y][j].set_offsets(np.c_[hitticks[y][j], hitsdata[y][j]])
                                     # scatters_order_data[y][j].set_array(colors[y][j])
                                     scatters_order_data[y][j].set_sizes(sizes[y][j])
@@ -246,11 +328,38 @@ class Lotto:
             plt.show()
 
 
+@app.route('/')
+def index():
+    points = convert_db_to_points(lt.history_db)
+    keys = list(lt.history_db.keys())
+
+    accumulative = lt.statistics.get_accumulative()
+    return render_template('index.html',
+                           range1=[lt.statistics.get_devianceminus()[0], lt.statistics.get_devianceplus()[0]],
+                           range2=[lt.statistics.get_devianceminus()[1], lt.statistics.get_devianceplus()[1]],
+                           range3=[lt.statistics.get_devianceminus()[2], lt.statistics.get_devianceplus()[2]],
+                           range4=[lt.statistics.get_devianceminus()[3], lt.statistics.get_devianceplus()[3]],
+                           range5=[lt.statistics.get_devianceminus()[4], lt.statistics.get_devianceplus()[4]],
+                           x_values=keys,
+                           y1_accumulative1=accumulative[0],
+                           y1_accumulative2=accumulative[4],
+                           y1_values1=points[0],
+                           y1_values2=points[1],
+                           y1_values3=points[2],
+                           y1_values4=points[3],
+                           y1_values5=points[4],
+                           y2_values1=points[5],
+                           y2_values2=points[6]
+                           )
+
+
 ####################################################
 if __name__ == "__main__":
     try:
         lt = Lotto(LOTTO_HISTORY_DB, LOTTO_ORDERS_DB)
-        lt.process_arguments(sys.argv)
+        # lt.process_arguments(sys.argv)
         lt.analyze()
+
+        app.run(debug=True)
     except Exception as e:
         log(e,)

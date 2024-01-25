@@ -159,19 +159,20 @@ def analysis_find_numbers(database, arg_five_or_seven_numbers):
 def analysis_get_statistics(points):
     """Statistics
     """
-
+    n_dim = len(points)
     means = []
     mins = []
     maxs = []
     deviance_positive = []
     deviance_negative = []
 
+    accumulative = [[], [], [], [], [], [], []]
     directions = [[], [], [], [], [], [], []]
     distances = [[], [], [], [], [], [], []]
     distance_means = []
 
     most_frequent = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
-    for x in range(7):
+    for x in range(n_dim):
 
         c_data = points[x]
         means.append(mean(c_data))
@@ -180,10 +181,15 @@ def analysis_get_statistics(points):
 
         # calculate deviance
         accumulator = 0
+        c_acc = 0
         frequency_number_count = [0] * (maxs[x] + 1)
 
-        y_len = len(c_data)
-        for y in range(y_len):
+        m_dim = len(c_data)
+        for y in range(m_dim):
+            c_acc += c_data[y]
+            c_mean = c_acc/(y + 1)
+            accumulative[x].append(c_mean)
+
             accumulator += math.pow(c_data[y] - means[x], 2)
             frequency_number_count[c_data[y]] = frequency_number_count[c_data[y]] + 1
 
@@ -208,7 +214,7 @@ def analysis_get_statistics(points):
                 directions[x].append(c_data[y-1] - c_data[y])
 
         distance_means.append(mean(distances[x]))
-        deviance_positive.append(means[x] + math.sqrt(accumulator/y_len))
-        deviance_negative.append(means[x] - math.sqrt(accumulator/y_len))
+        deviance_positive.append(means[x] + math.sqrt(accumulator/m_dim))
+        deviance_negative.append(means[x] - math.sqrt(accumulator/m_dim))
 
-    return (means, mins, maxs, distance_means, deviance_positive, deviance_negative, directions, distances, most_frequent)
+    return (means, mins, maxs, distance_means, deviance_positive, deviance_negative, directions, distances, most_frequent, accumulative)

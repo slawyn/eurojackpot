@@ -13,7 +13,11 @@ class Predictor:
     def predict_simple(self, history_points, statistics):
         correlations = []
 
-        means, mins, maxs, distance_means, devianceplus, devianceminus, directions, distances, most_frequent = statistics
+        print(statistics)
+        means = statistics.get_means()
+        devianceplus = statistics.get_devianceplus()
+        devianceminus = statistics.get_devianceminus()
+        directions = statistics.get_directions()
 
         MAX_VALUE = 51
 
