@@ -331,7 +331,7 @@ class Lotto:
 @app.route('/')
 def index():
     points = convert_db_to_points(lt.history_db)
-    keys = list(lt.history_db.keys())
+    orders = convert_db_to_points(lt.orders_db)
 
     accumulative = lt.statistics.get_accumulative()
     return render_template('index.html',
@@ -340,7 +340,7 @@ def index():
                            range3=[lt.statistics.get_devianceminus()[2], lt.statistics.get_devianceplus()[2]],
                            range4=[lt.statistics.get_devianceminus()[3], lt.statistics.get_devianceplus()[3]],
                            range5=[lt.statistics.get_devianceminus()[4], lt.statistics.get_devianceplus()[4]],
-                           x_values=keys,
+                           x1_values=list(lt.history_db.keys()),
                            y1_accumulative1=accumulative[0],
                            y1_accumulative2=accumulative[4],
                            y1_values1=points[0],
@@ -349,7 +349,9 @@ def index():
                            y1_values4=points[3],
                            y1_values5=points[4],
                            y2_values1=points[5],
-                           y2_values2=points[6]
+                           y2_values2=points[6],
+                           x2_values=list(lt.orders_db.keys()),
+                           z2_values=orders[0]
                            )
 
 
