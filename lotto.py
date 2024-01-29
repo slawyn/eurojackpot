@@ -335,11 +335,11 @@ def index():
 
     accumulative = lt.statistics.get_accumulative()
     return render_template('index.html',
-                           range1=[lt.statistics.get_devianceminus()[0], lt.statistics.get_devianceplus()[0]],
-                           range2=[lt.statistics.get_devianceminus()[1], lt.statistics.get_devianceplus()[1]],
-                           range3=[lt.statistics.get_devianceminus()[2], lt.statistics.get_devianceplus()[2]],
-                           range4=[lt.statistics.get_devianceminus()[3], lt.statistics.get_devianceplus()[3]],
-                           range5=[lt.statistics.get_devianceminus()[4], lt.statistics.get_devianceplus()[4]],
+                           range1=[int(lt.statistics.get_devianceminus()[0]), int(lt.statistics.get_devianceplus()[0])],
+                           range2=[int(lt.statistics.get_devianceminus()[1]), int(lt.statistics.get_devianceplus()[1])],
+                           range3=[int(lt.statistics.get_devianceminus()[2]), int(lt.statistics.get_devianceplus()[2])],
+                           range4=[int(lt.statistics.get_devianceminus()[3]), int(lt.statistics.get_devianceplus()[3])],
+                           range5=[int(lt.statistics.get_devianceminus()[4]), int(lt.statistics.get_devianceplus()[4])],
                            x1_values=list(lt.history_db.keys()),
                            y1_accumulative1=accumulative[0],
                            y1_accumulative2=accumulative[4],

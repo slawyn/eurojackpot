@@ -63,6 +63,7 @@
                     ticks: {
                         beginAtZero: true
                     }
+				
                 }]
             }
         };
@@ -70,16 +71,17 @@
         var options = {
             scales: {
                 x: {
-                    max: 100,
-                    min: 10,
+                    max: 1000,
+                    min: 100,
+					labels: x1_values,
                     ticks: {
                         stepSize: 1
-                    }
+                    },
+					start: x1_values.length-10
+		
                 },
                 y: {
-                    ticks: {
-                        beginAtZero: true
-                    }
+					position: 'left'
                 }
             },
             plugins: {
@@ -171,8 +173,6 @@
 				borderWidth: 1,
 				backgroundColor: 'rgba(153, 102, 255)',
             }
-
-
         ]
             };
 
