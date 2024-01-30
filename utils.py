@@ -71,6 +71,19 @@ def update_db(filename, database, difference):
 
     return database
 
+def convert_db_to_points_extended(keys, database):
+    '''Extend points
+    '''
+    points = [[], [], [], [], [], [], []] 
+    for key in keys:
+        if key in database:
+            numbers = database[key][0]
+            for x in range(len(numbers)):
+                points[x].append(numbers[x])
+        else:
+            for x in range(len(points)):
+                points[x].append('null')
+    return points
 
 def convert_db_to_points(database):
     """Convert db dictionary to list of points for each number

@@ -11,6 +11,10 @@
     <h1>Lotto</h1>
     <div>
         <canvas id="myBarChart" width="200" height="200"></canvas>
+        
+    </div>
+    <div>
+        <canvas id="myPieChart"></canvas>
     </div>
     <div>
         <canvas id="myChart1"></canvas>
@@ -36,8 +40,15 @@
 		
 		const y2_values1 = {{y2_values1 |safe}};
 		const y2_values2 = {{y2_values2 |safe}};
-        const z2_values = {{ z2_values | safe}};
-	
+        const o1_values = {{ o1_values | safe}};
+        const o2_values = {{ o2_values | safe}};
+        const o3_values = {{ o3_values | safe}};
+        const o4_values = {{ o4_values | safe}};
+        const o5_values = {{ o5_values | safe}};
+        
+        const numbers_ratio = {{numbers_ratio|safe}};
+
+        let numbers_ratio_x =Object.keys(numbers_ratio);
         // Data for the bar chart with offsets
         var data_bar = {
             labels: ['1st', '2nd', '3rd', '4th', '5th'],
@@ -71,13 +82,10 @@
         var options = {
             scales: {
                 x: {
-                    max: 1000,
-                    min: 100,
-					labels: x1_values,
+                    max: 100,
                     ticks: {
                         stepSize: 1
                     },
-					start: x1_values.length-10
 		
                 },
                 y: {
@@ -107,12 +115,40 @@
 
 		
         var data1 =
-        {
-            labels: x1_values,
+        {   
+labels: x1_values,
 			datasets: [
 		    {
-                label: 'xxx',
-                data: x2_values.map((x, i) => ({ x, y: z2_values[i] })),
+                label: 'o1',
+                data: o1_values,
+                borderColor: 'rgba(255, 99, 132)',
+                fill: true,
+                borderWidth: 1
+            },
+            {
+                label: 'o2',
+                data: o2_values,
+                borderColor: 'rgba(255, 99, 132)',
+                fill: true,
+                borderWidth: 1
+            },
+            {
+                label: 'o3',
+                data: o3_values,
+                borderColor: 'rgba(255, 99, 132)',
+                fill: true,
+                borderWidth: 1
+            },
+            {
+                label: 'o4',
+                data: o4_values,
+                borderColor: 'rgba(255, 99, 132)',
+                fill: true,
+                borderWidth: 1
+            },
+            {
+                label: 'o5',
+                data: o5_values,
                 borderColor: 'rgba(255, 99, 132)',
                 fill: true,
                 borderWidth: 1
@@ -219,6 +255,46 @@
             data: data_bar,
             options: options_bar
         });
+
+
+    var data = {
+      labels: numbers_ratio_x,
+      datasets: [{
+        data: numbers_ratio_x.map((x) => (numbers_ratio[x])),
+        backgroundColor: getRandomColors(numbers_ratio_x.length),
+      }]
+    };
+
+    // Create the pie chart
+    var ctx = document.getElementById('myPieChart').getContext('2d');
+    var myPieChart = new Chart(ctx, {
+      type: 'pie',
+      data: data,
+      options: {
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                var label = context.label || '';
+                var value = context.formattedValue;
+                return label + ': ' + value + '%';
+              }
+            }
+          }
+        }
+      }
+    });
+
+        function getRandomColors(count) {
+            var colors = [];
+            for (var i = 0; i < count; i++) {
+              colors.push(`rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.7)`);
+            }
+            return colors;
+         }
     </script>
 </body>
 

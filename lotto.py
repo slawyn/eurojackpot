@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 import numpy as np
-from utils import log, load_db, update_db, analysis_get_statistics, analysis_find_frequencies, analysis_find_numbers, convert_db_to_points
+from utils import *
 from updater import fetch_difference_db
 from predictor import *
 from statistics import mean
@@ -37,6 +37,9 @@ class Statistics:
         self.distance_means = []
 
         most_frequent = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+        self.numbers_ratio = [0]*51
+
+        m_dim = len(points[0])
         for x in range(n_dim):
 
             c_data = points[x]
@@ -49,14 +52,16 @@ class Statistics:
             c_acc = 0
             frequency_number_count = [0] * (self.maxs[x] + 1)
 
-            m_dim = len(c_data)
             for y in range(m_dim):
                 c_acc += c_data[y]
                 c_mean = c_acc/(y + 1)
                 self.accumulative[x].append(c_mean)
 
                 accumulator += math.pow(c_data[y] - self.means[x], 2)
+
+                # count number frequency
                 frequency_number_count[c_data[y]] = frequency_number_count[c_data[y]] + 1
+                self.numbers_ratio[c_data[y]] = self.numbers_ratio[c_data[y]] + 1
 
                 # Most frequent numbers
                 if frequency_number_count[c_data[y]] > most_frequent[x][0]:
@@ -81,6 +86,16 @@ class Statistics:
             self.distance_means.append(mean(self.distances[x]))
             self.deviance_positive.append(self.means[x] + math.sqrt(accumulator/m_dim))
             self.deviance_negative.append(self.means[x] - math.sqrt(accumulator/m_dim))
+
+        #calculate percentage
+        for idx, num in enumerate(self.numbers_ratio):
+            self.numbers_ratio[idx]= num/(m_dim*n_dim) * 100
+
+    def get_numbers_ratio(self):
+        dict = {}
+        for idx, percentage in enumerate(self.numbers_ratio):
+            dict[idx] = percentage
+        return dict
 
     def get_accumulative(self):
         return self.accumulative
@@ -330,17 +345,19 @@ class Lotto:
 
 @app.route('/')
 def index():
-    points = convert_db_to_points(lt.history_db)
-    orders = convert_db_to_points(lt.orders_db)
 
+    keys = list(lt.history_db.keys())
+    points = convert_db_to_points(lt.history_db)
+    orders = convert_db_to_points_extended(keys, lt.orders_db)
     accumulative = lt.statistics.get_accumulative()
+    numbers_ratio = lt.statistics.get_numbers_ratio()
     return render_template('index.html',
                            range1=[int(lt.statistics.get_devianceminus()[0]), int(lt.statistics.get_devianceplus()[0])],
                            range2=[int(lt.statistics.get_devianceminus()[1]), int(lt.statistics.get_devianceplus()[1])],
                            range3=[int(lt.statistics.get_devianceminus()[2]), int(lt.statistics.get_devianceplus()[2])],
                            range4=[int(lt.statistics.get_devianceminus()[3]), int(lt.statistics.get_devianceplus()[3])],
                            range5=[int(lt.statistics.get_devianceminus()[4]), int(lt.statistics.get_devianceplus()[4])],
-                           x1_values=list(lt.history_db.keys()),
+                           x1_values=keys,
                            y1_accumulative1=accumulative[0],
                            y1_accumulative2=accumulative[4],
                            y1_values1=points[0],
@@ -351,7 +368,12 @@ def index():
                            y2_values1=points[5],
                            y2_values2=points[6],
                            x2_values=list(lt.orders_db.keys()),
-                           z2_values=orders[0]
+                           o1_values=orders[0],
+                           o2_values=orders[1],
+                           o3_values=orders[2],
+                           o4_values=orders[3],
+                           o5_values=orders[4],
+                           numbers_ratio=numbers_ratio
                            )
 
 

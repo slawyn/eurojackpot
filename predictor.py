@@ -13,7 +13,6 @@ class Predictor:
     def predict_simple(self, history_points, statistics):
         correlations = []
 
-        print(statistics)
         means = statistics.get_means()
         devianceplus = statistics.get_devianceplus()
         devianceminus = statistics.get_devianceminus()
