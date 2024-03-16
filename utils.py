@@ -97,6 +97,25 @@ def convert_db_to_points(database):
     return points
 
 
+def analysis_find_matched(to_match, tips):
+    '''Find tips that matched the lotto numbers
+    '''
+    matched = {}
+    for key, values in tips.items():
+        tipped = []
+        for numbers in values:
+            tipped.extend(numbers)
+        
+        if key not in to_match:
+            print(f"WARNING: ordered key {key} not yet in history")
+            
+        else:
+            history_numbers = to_match[key][0]
+            incorrect = set(history_numbers) - set(tipped)
+            correct = set(history_numbers) - incorrect
+            matched[key] = [history_numbers, list(correct), list(incorrect)]
+    return matched 
+
 def analysis_find_frequencies(database):
     """Find most frequent number combinations
     """

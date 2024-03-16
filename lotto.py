@@ -178,6 +178,9 @@ class Lotto:
                 else:
                     i = paramtickcount
 
+    def get_matched_numbers(self):
+        return analysis_find_matched(self.history_db,self.orders_db)
+
     def analyze(self):
         """Execute
         """
@@ -188,25 +191,25 @@ class Lotto:
         self.statistics = Statistics(history_points)
         freqs_history = analysis_find_frequencies(self.history_db)
         if (len(freqs_history) > 1):
-            log("Repetitions found in history_db: %s" % (str(freqs_history)))
+            log(f"Repetitions found in history_db: {str(freqs_history)}")
 
         freqs_orders = analysis_find_frequencies(self.orders_db)
         if (len(freqs_orders) > 1):
-            log("Repetitions found in orders_db: %s" % (str(freqs_orders)))
+            log(f"Repetitions found in orders_db: {str(freqs_history)}")
 
         # Check if numbers are in the database
         if len(self.opt_analyze_find_numbers) > 0:
             found_in_history = analysis_find_numbers(self.history_db, self.opt_analyze_find_numbers)
             found_in_orders = analysis_find_numbers(self.orders_db, self.opt_analyze_find_numbers)
             if (len(found_in_history) > 0):
-                log("Checked numbers found in history_db: %s" % (str(found_in_history)))
+                log(f"Checked numbers found in history_db: {(str(found_in_history))}")
             else:
-                log("Checked numbers are unique for history_db")
+                log(f"Checked numbers are unique for history_db")
 
             if (len(found_in_orders) > 0):
-                log("Checked numbers found in orders_db: %s" % (str(found_in_orders)))
+                log(f"Checked numbers found in orders_db: {(str(found_in_orders))}")
             else:
-                log("Checked numbers are unique for orders_db")
+                log(f"Checked numbers are unique for orders_db")
 
         # Try to guess
         else:
@@ -214,15 +217,15 @@ class Lotto:
             log("Guessed: %s" % (guessed))
             guessed_in_history = analysis_find_numbers(self.history_db, guessed)
             if (len(guessed_in_history) > 0):
-                log("Guessed numbers found in history_db: %s" % (str(guessed_in_history)))
+                log(f"Guessed numbers found in history_db: {(str(guessed_in_history))}")
             else:
-                log("Guessed numbers are unique for history_db")
+                log(f"Guessed numbers are unique for history_db")
 
             guessed_in_orders = analysis_find_numbers(self.orders_db, guessed)
             if (len(guessed_in_orders) > 0):
-                log("Guessed numbers found in orders_db: %s" % (str(guessed_in_orders)))
+                log(f"Guessed numbers found in orders_db: {(str(guessed_in_orders))}")
             else:
-                log("Guessed numbers are unique for orders_db")
+                log(f"Guessed numbers are unique for orders_db")
 
         # Draw
         if self.opt_plot_data:
@@ -253,7 +256,7 @@ class Lotto:
             for x in range(len(axes)):
                 axes[x].margins(0)
                 axes[x].set_title(titles[x])
-                axes[x].set_ylim([mins[x]-2, maxs[x]+2])
+                axes[x].set_ylim([lt.statistics.get_mins()[x]-2, lt.statistics.get_maxs()[x]+2])
                 axes[x].set_xticks(ticks=xticks)
                 axes[x].xaxis.set_visible(False)
                 plotlines_data[x].append(axes[x].plot([], [], "b-", zorder=+3)[0])
@@ -267,8 +270,8 @@ class Lotto:
                 cmap = plt.cm.get_cmap('RdYlBu')
 
                 for x in range(len(axes)):
-                    axes[x].fill_between(xticks[:], [devianceplus[x]] * (tickcount), [devianceminus[x]] * (tickcount), facecolor='green', alpha=0.45, zorder=3)
-                    axes[x].plot(xticks[:], [means[x]]*(tickcount), zorder=3)
+                    axes[x].fill_between(xticks[:], [lt.statistics.get_devianceplus()[x]] * (tickcount), [lt.statistics.get_devianceminus()[x]] * (tickcount), facecolor='green', alpha=0.45, zorder=3)
+                    axes[x].plot(xticks[:], [lt.statistics.get_means()[x]]*(tickcount), zorder=3)
 
                 def animate(i):
                     out = []
@@ -326,8 +329,8 @@ class Lotto:
             # normal plot
             else:
                 for x in range(len(axes)):
-                    axes[x].fill_between(xticks[:], [devianceplus[x]]*(tickcount), [devianceminus[x]]*(tickcount), facecolor='green', alpha=0.45, zorder=3)
-                    axes[x].plot(xticks[:], [means[x]]*(tickcount), zorder=3)
+                    axes[x].fill_between(xticks[:], [lt.statistics.get_devianceplus()[x]]*(tickcount), [lt.statistics.get_devianceminus()[x]]*(tickcount), facecolor='green', alpha=0.45, zorder=3)
+                    axes[x].plot(xticks[:], [lt.statistics.get_means()[x]]*(tickcount), zorder=3)
 
                 def animateData(i):
                     out = []
@@ -343,15 +346,15 @@ class Lotto:
             plt.show()
 
 
-@app.route('/')
-def index():
-
+@app.route('/script.js')
+def script():
     keys = list(lt.history_db.keys())
     points = convert_db_to_points(lt.history_db)
-    orders = convert_db_to_points_extended(keys, lt.orders_db)
     accumulative = lt.statistics.get_accumulative()
     numbers_ratio = lt.statistics.get_numbers_ratio()
-    return render_template('index.html',
+
+    matched = lt.get_matched_numbers()
+    return render_template('script.js',
                            range1=[int(lt.statistics.get_devianceminus()[0]), int(lt.statistics.get_devianceplus()[0])],
                            range2=[int(lt.statistics.get_devianceminus()[1]), int(lt.statistics.get_devianceplus()[1])],
                            range3=[int(lt.statistics.get_devianceminus()[2]), int(lt.statistics.get_devianceplus()[2])],
@@ -367,15 +370,13 @@ def index():
                            y1_values5=points[4],
                            y2_values1=points[5],
                            y2_values2=points[6],
-                           x2_values=list(lt.orders_db.keys()),
-                           o1_values=orders[0],
-                           o2_values=orders[1],
-                           o3_values=orders[2],
-                           o4_values=orders[3],
-                           o5_values=orders[4],
-                           numbers_ratio=numbers_ratio
+                           numbers_ratio=numbers_ratio,
+                           matched=matched
                            )
 
+@app.route('/')
+def index():
+    return render_template('index.html', VERSION=VERSION)
 
 ####################################################
 if __name__ == "__main__":
