@@ -168,22 +168,22 @@ labels: x1_values,
 
         ]
             };
-        var ctx1 = document.getElementById('myChart1').getContext('2d');
+        var ctx1 = document.getElementById('idChartFiveNumbers').getContext('2d');
         var myChart = new Chart(ctx1, {
             type: 'line',
             data: data1,
             options: options
         });
 
-        var ct2x = document.getElementById('myChart2').getContext('2d');
-        var myChart2 = new Chart(ct2x, {
+        var ct2x = document.getElementById('idChartTwoNumbers').getContext('2d');
+        var idChartTwoNumbers = new Chart(ct2x, {
             type: 'line',
             data: data2,
             options: options
         });
 
-        var ctx = document.getElementById('myBarChart').getContext('2d');
-        var myBarChart = new Chart(ctx, {
+        var ctx = document.getElementById('idBarChart').getContext('2d');
+        var idBarChart = new Chart(ctx, {
             type: 'bar',
             data: data_bar,
             options: options_bar
@@ -199,8 +199,8 @@ labels: x1_values,
     };
 
     // Create the pie chart
-    var ctx = document.getElementById('myPieChart').getContext('2d');
-    var myPieChart = new Chart(ctx, {
+    var ctx = document.getElementById('idPieChart').getContext('2d');
+    var idPieChart = new Chart(ctx, {
       type: 'pie',
       data: data,
       options: {

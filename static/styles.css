@@ -8,43 +8,43 @@
 .horizontal-15-div
 {
     width: 15%;
-    height: 15%;
+    height: 100%;
 }
 
 .horizontal-30-div
 {
     width: 30%;
-    height: 30%;
+    height: 100%;
 }
 
 .horizontal-70-div
 {
     width: 70%;
-    height: 70%;
+    height: 100%;
 }
 
 .horizontal-85-div
 {
     width: 85%;
-    height: 85%;
+    height: 100%;
 }
 
 .horizontal-90-div
 {
     width: 90%;
-    height: 90%;
+    height: 100%;
 }
 
 .horizontal-10-div
 {
     width: 10%;
-    height: 10%;
+    height: 100%;
 }
 
 .horizontal-25-div
 {
     width: 25%;
-    height: 25%;
+    height: 100%;
 }
 
 .green-bg {
@@ -55,4 +55,9 @@
 .beige-bg {
     background-color: beige;
     border-radius: 25px
+}
+.chart-size
+{
+    height: 100%;
+    width: 100%;
 }
