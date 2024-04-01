@@ -195,7 +195,7 @@ class Lotto:
 
         freqs_orders = analysis_find_frequencies(self.orders_db)
         if (len(freqs_orders) > 1):
-            log(f"Repetitions found in orders_db: {str(freqs_history)}")
+            log(f"Repetitions found in orders_db: {str(freqs_orders)}")
 
         # Check if numbers are in the database
         if len(self.opt_analyze_find_numbers) > 0:
