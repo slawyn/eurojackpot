@@ -385,6 +385,6 @@ if __name__ == "__main__":
         # lt.process_arguments(sys.argv)
         lt.analyze()
 
-        app.run(debug=True)
+        app.run(debug=True, port=80)
     except Exception as e:
         log(e,)
