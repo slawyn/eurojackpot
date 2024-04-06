@@ -110,10 +110,17 @@ def analysis_find_matched(to_match, tips):
             print(f"WARNING: ordered key {key} not yet in history")
             
         else:
-            history_numbers = to_match[key][0]
-            incorrect = set(history_numbers) - set(tipped)
-            correct = set(history_numbers) - incorrect
-            matched[key] = [history_numbers, list(correct), list(incorrect)]
+            lotto5, lotto2= tipped[:5], tipped[5:]
+            history5, history2 = to_match[key][0][:5],to_match[key][0][5:]
+
+
+            incorrect5 = set(history5) - set(lotto5)
+            correct5 = set(history5) - incorrect5
+
+            incorrect2 = set(history2) - set(lotto2)
+            correct2 = set(history2) - incorrect2
+
+            matched[key] = [[history5, list(correct5), list(incorrect5)],[history2, list(correct2), list(incorrect2)]]
     return matched 
 
 def analysis_find_frequencies(database):

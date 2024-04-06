@@ -244,21 +244,26 @@ labels: x1_values,
         td.innerHTML = timestamp;
         row.appendChild(td)
         
-        let lotto_numbers = matched[timestamp][0];
-        let tipped_correctly = matched[timestamp][1];
-        for (let number of lotto_numbers) {
-            let td = document.createElement("td")
-            td.innerHTML = number
-
-            if(tipped_correctly.includes(number))
-            {
-                td.className = "green-bg"
+        let numberSets = matched[timestamp]
+        for(let subtype in numberSets)
+        {
+            
+            let lotto_numbers = numberSets[subtype][0];
+            let tipped_correctly = numberSets[subtype][1];
+            for (let number of lotto_numbers) {
+                let td = document.createElement("td")
+                td.innerHTML = number
+                
+                if(tipped_correctly.includes(number))
+                {
+                    td.className = "green-bg"
+                }
+                else
+                {
+                    td.className = "beige-bg"
+                }
+                row.appendChild(td)
             }
-            else
-            {
-                td.className = "beige-bg"
-            }
-            row.appendChild(td)
         }
         table.appendChild(row)
     }
