@@ -25,6 +25,7 @@ class Statistics:
         """Statistics
         """
         n_dim = len(points)
+        self.points = points
         self.means = []
         self.mins = []
         self.maxs = []
@@ -78,10 +79,7 @@ class Statistics:
                 if y == 0:
                     self.directions[x].append(0)
 
-                elif c_data[y] > c_data[y-1]:
-                    self.directions[x].append(c_data[y]-c_data[y-1])
-                else:
-                    self.directions[x].append(c_data[y-1] - c_data[y])
+                self.directions[x].append(c_data[y]-c_data[y-1])
 
             self.distance_means.append(mean(self.distances[x]))
             self.deviance_positive.append(self.means[x] + math.sqrt(accumulator/m_dim))
@@ -112,7 +110,15 @@ class Statistics:
     def get_directions(self):
         return self.directions
 
+    def get_distance_means(self):
+        return self.distance_means
 
+    def get_latest_history_numbers(self):
+        last_numbers = []
+        for x in range(len(self.points)):
+            last_numbers.append(self.points[x][-1])
+        return last_numbers
+    
 class Lotto:
     """Main class
     """
