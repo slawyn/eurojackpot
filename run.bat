@@ -1,3 +1,3 @@
 @echo off
 
-python lotto.py
+python app.py --db database/lottoDB --orders database/ordersDB

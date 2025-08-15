@@ -1,11 +1,6 @@
-
 import os
-
-
 import datetime
-
 from statistics import mean
-
 import math
 
 
@@ -50,7 +45,8 @@ def load_db(filename):
             lines = f.readlines()
             for line in lines:
                 splits = line.strip().split(" ")
-                entry = [int(splits[1]), int(splits[2]), int(splits[3]), int(splits[4]), int(splits[5]), int(splits[6]), int(splits[7])]
+                entry = [int(splits[1]), int(splits[2]), int(splits[3]), int(
+                    splits[4]), int(splits[5]), int(splits[6]), int(splits[7])]
                 if splits[0] in database:
                     database[splits[0]].append(entry)
                 else:
@@ -61,20 +57,20 @@ def load_db(filename):
 def update_db(filename, database, difference):
     """Update DB file
     """
-
     with open(filename, "a") as f:
-        for t, numbers in zip(difference[0], difference[1]):
-            database[t] = [numbers]
-            f.write("\n" + t)
+        for timestamp, numbers in difference.items():
+            database[timestamp] = [numbers]
+            f.write("\n" + timestamp)
             for n in numbers:
                 f.write(" " + str(n))
 
     return database
 
+
 def convert_db_to_points_extended(keys, database):
     '''Extend points
     '''
-    points = [[], [], [], [], [], [], []] 
+    points = [[], [], [], [], [], [], []]
     for key in keys:
         if key in database:
             numbers = database[key][0]
@@ -84,6 +80,7 @@ def convert_db_to_points_extended(keys, database):
             for x in range(len(points)):
                 points[x].append('null')
     return points
+
 
 def convert_db_to_points(database):
     """Convert db dictionary to list of points for each number
@@ -105,14 +102,13 @@ def analysis_find_matched(to_match, tips):
         tipped = []
         for numbers in values:
             tipped.extend(numbers)
-        
+
         if key not in to_match:
             print(f"WARNING: ordered key {key} not yet in history")
-            
-        else:
-            lotto5, lotto2= tipped[:5], tipped[5:]
-            history5, history2 = to_match[key][0][:5],to_match[key][0][5:]
 
+        else:
+            lotto5, lotto2 = tipped[:5], tipped[5:]
+            history5, history2 = to_match[key][0][:5], to_match[key][0][5:]
 
             incorrect5 = set(history5) - set(lotto5)
             correct5 = set(history5) - incorrect5
@@ -120,8 +116,9 @@ def analysis_find_matched(to_match, tips):
             incorrect2 = set(history2) - set(lotto2)
             correct2 = set(history2) - incorrect2
 
-            matched[key] = [[history5, list(correct5), list(incorrect5)],[history2, list(correct2), list(incorrect2)]]
-    return matched 
+            matched[key] = [[history5, list(correct5), list(incorrect5)], [history2, list(correct2), list(incorrect2)]]
+    return matched
+
 
 def analysis_find_frequencies(database):
     """Find most frequent number combinations

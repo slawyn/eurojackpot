@@ -1,7 +1,6 @@
-from utils import log
-
-from utils import correlate
 import random
+
+from .utils import log, correlate
 
 
 class Predictor:
@@ -20,7 +19,6 @@ class Predictor:
         directions = statistics.get_directions()
         last_numbers = statistics.get_latest_history_numbers()
 
-
         # highest correlation is always to the next one
         for x in range(len(directions)-1):
             y = x + 1
@@ -37,15 +35,14 @@ class Predictor:
             guessed_number1 = int(last_numbers[x] + distance_means[x] * dir)
             guessed_number2 = int(last_numbers[x] + distance_means[x] * dir*-1.0)
             guessed_number3 = int(means[x])
-            if guessed_number1>0 and guessed_number1 not in guessed_movement:
+            if guessed_number1 > 0 and guessed_number1 not in guessed_movement:
                 guessed_movement.append(guessed_number1)
-            elif guessed_number2>0 and guessed_number2 not in guessed_movement:
+            elif guessed_number2 > 0 and guessed_number2 not in guessed_movement:
                 guessed_movement.append(guessed_number2)
-            elif guessed_number3>0 and guessed_number3 not in guessed_movement:
+            elif guessed_number3 > 0 and guessed_number3 not in guessed_movement:
                 guessed_movement.append(guessed_number3)
             else:
                 return []
-
 
         guessed_numbers = []
         guessed_numbers.extend(sorted(guessed_movement[:-2]))
